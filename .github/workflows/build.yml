@@ -66,15 +66,15 @@ jobs:
 #        matrix:
 #            kernel: ${{ fromJson(needs.build-kernels.outputs.matrix.kernels) }}
     steps:
-      - name: Download built kernels
-        uses: actions/download-artifact@v3
-      - name: Download built firmware
-        uses: actions/download-artifact@v3
+      - name: Download built artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
       - name: Identify stable version
         run: echo "RELEASE_VERSION_TYPE=x86_64" >> $GITHUB_ENV
       - name: Generate release details
         run: |
-          ls -lR .
+          free -h
           RELEASE_DATE=$(date '+%Y%m%d%H%M%S')
           RELEASE_VERSION=""
           RELEASE_FILE="${RELEASE_DATE}_${RELEASE_VERSION_TYPE}.tar.gz"
@@ -85,7 +85,7 @@ jobs:
       - name: Create a release and upload artifacts as assets
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "*tar.gz"
+          artifacts: "/tmp/*tar.gz"
           token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
           tag: "${{ env.RELEASE_DATE }}"
